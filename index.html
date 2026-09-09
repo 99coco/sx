@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>尚学教育管理系统</title>
+    <meta name="description" content="尚学教育 - AI 智能补课机构管理与学习平台" />
+    <!-- PWA：添加到主屏幕（Android Chrome / iOS Safari） -->
+    <meta name="theme-color" content="#0B0F14" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="尚学教育" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- 数理化公式渲染：题目详情中的 $...$ LaTeX 公式自动排版 -->
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+        options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
+        startup: { typeset: false }
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <script type="module" crossorigin src="/assets/index-zDBv45zl.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CGE0xTHG.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- PWA：Service Worker 离线缓存（仅 https 或本机 localhost 注册） -->
+    <script>
+      (function () {
+        if ('serviceWorker' in navigator) {
+          var host = location.hostname;
+          if (location.protocol === 'https:' || host === 'localhost' || host === '127.0.0.1') {
+            window.addEventListener('load', function () {
+              navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                console.warn('Service Worker 注册失败：', e);
+              });
+            });
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
