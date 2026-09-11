@@ -1,7 +1,7 @@
 {
-  "name": "尚学教育",
-  "short_name": "尚学教育",
-  "description": "尚学教育 - AI 智能补课机构管理与学习平台",
+  "name": "智课运营云",
+  "short_name": "智课运营云",
+  "description": "智课运营云 · AI 智能补课机构管理与学习平台",
   "lang": "zh-CN",
   "start_url": "/#/login",
   "scope": "/",
