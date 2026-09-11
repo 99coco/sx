@@ -3,28 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>尚学教育管理系统</title>
-    <meta name="description" content="尚学教育 - AI 智能补课机构管理与学习平台" />
+    <title>智课运营云</title>
+    <meta name="description" content="智课运营云 · AI 智能补课机构管理与学习平台" />
     <!-- PWA：添加到主屏幕（Android Chrome / iOS Safari） -->
     <meta name="theme-color" content="#0B0F14" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="尚学教育" />
-    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-title" content="智课运营云" />
+    <link id="manifest-link" rel="manifest" href="/manifest.json" />
+    <!-- 启动前拉取机构名称，覆盖默认标题 / 应用名（避免闪现“尚学教育”） -->
+    <script>
+      (function () {
+        function applyOrg(name) {
+          if (!name) return;
+          document.title = name + '管理系统';
+          var am = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+          if (am) am.setAttribute('content', name);
+          // 动态重写 manifest：应用安装名随机构名变化（系统设置 → 机构名称）
+          // 关键点：manifest 最终以 Blob URL 注入，相对路径无法在 blob 上下文解析，
+          // 必须先把 start_url / scope / icons.src 转成绝对路径，否则浏览器报
+          // “Manifest: property 'X' ignored, URL is invalid”。
+          try {
+            fetch('/manifest.json').then(function (r) { return r.json(); }).then(function (m) {
+              m.name = name; m.short_name = name;
+              m.description = name + ' - AI 智能补课机构管理与学习平台';
+              var base = location.origin;
+              if (m.start_url && m.start_url.charAt(0) === '/') m.start_url = base + m.start_url;
+              if (m.scope && m.scope.charAt(0) === '/') m.scope = base + m.scope;
+              if (Array.isArray(m.icons)) {
+                m.icons.forEach(function (ic) {
+                  if (ic && ic.src && ic.src.charAt(0) === '/') ic.src = base + ic.src;
+                });
+              }
+              var blob = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' });
+              var link = document.getElementById('manifest-link');
+              if (link) link.href = URL.createObjectURL(blob);
+            }).catch(function () {});
+          } catch (e) {}
+        }
+        function loadOrg() {
+          // 注意：仅用 /api/settings/org。/api/index.php/... 是 InfinityFree 旧式入口，
+          // 主机(umax.cc)与线上(.htaccess 已重写 /api)都不需要也不认该路径，
+          // 之前加的兜底会在主机上产生 404/499 错误请求，已移除。
+          var urls = ['/api/settings/org'];
+          (function next(i) {
+            if (i >= urls.length) return;
+            fetch(urls[i]).then(function (r) { return r.json(); }).then(function (d) {
+              var n = d && d.data && d.data.org_name;
+              if (n) applyOrg(n); else next(i + 1);
+            }).catch(function () { next(i + 1); });
+          })(0);
+        }
+        loadOrg();
+      })();
+    </script>
     <link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <!-- 数理化公式渲染：题目详情中的 $...$ LaTeX 公式自动排版 -->
-    <script>
-      window.MathJax = {
-        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-        options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
-        startup: { typeset: false }
-      };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-    <script type="module" crossorigin src="/assets/index-DVP6jSzU.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Cuv8TMTN.css">
+    <!-- 数理化公式渲染：统一走 KaTeX（已打包进 bundle，不依赖 eval，满足 CSP 要求）。
+         原先的 MathJax CDN 脚本(tex-mml-chtml.js)运行时使用 eval/new Function，
+         会被严格 CSP 拦截并触发“Content Security Policy blocks eval”告警，且站点数学排版
+         实际全部由 KaTeX 的 renderMath() 完成（MathJax 仅冗余加载），故已移除。 -->
+    <script type="module" crossorigin src="/assets/index-CdhBKTKC.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BcgAOhMC.css">
   </head>
   <body>
     <div id="app"></div>
