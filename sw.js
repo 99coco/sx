@@ -7,8 +7,8 @@
      3) /api/* 与跨域请求 → 一律直连不缓存（业务数据必须实时）
    - 版本号变更请同步 SW 名称里的 vN，activate 时自动清旧缓存
    ============================================================ */
-const ASSET_CACHE = 'sx-assets-v1';
-const SHELL_CACHE = 'sx-shell-v1';
+const ASSET_CACHE = 'sx-assets-v2';
+const SHELL_CACHE = 'sx-shell-v2';
 const MAX_ASSETS = 260;
 
 self.addEventListener('install', () => {
